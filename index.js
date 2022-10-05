@@ -58,6 +58,14 @@ const init = async () => {
         }
     });
 
+    server.route({
+        method: 'GET',
+        path: '/allTemperatures',
+        handler: (request, h) => {
+            return datas;
+        }
+    });
+
     await server.start();
     console.log('Server running on %s', server.info.uri);
 };
