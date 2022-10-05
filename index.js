@@ -1,5 +1,6 @@
 const datas = require('./temperatures.json')
 const Hapi = require('@hapi/hapi');
+const moment = require('moment');
 
 const init = async () => {
 
@@ -32,11 +33,31 @@ const init = async () => {
         options: {
             cors: {origin: ['*']},
             handler: (request, h) => {
-                console.log('datas', datas)
                 return datas[datas.length - 1]
             }
         }
     });
+
+    server.route({
+        method: 'GET',
+        path: '/temperaturesByWeek',
+        handler: (request, h) => {
+            return datas.filter((el)=> {
+                return el.date > moment().startOf('week').add(1, 'day').format('YYYY-MM-DD HH:mm:ss') && el.date < moment().endOf('week').add(1, 'day').format('YYYY-MM-DD HH:mm:ss')
+            });
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/temperaturesByMonth',
+        handler: (request, h) => {
+            return datas.filter((el)=> {
+                return el.date > moment().startOf('month').format('YYYY-MM-DD HH:mm:ss') && el.date < moment().endOf('month').format('YYYY-MM-DD HH:mm:ss')
+            });
+        }
+    });
+
     await server.start();
     console.log('Server running on %s', server.info.uri);
 };
